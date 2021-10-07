@@ -1,0 +1,5 @@
+require:
+  - rubocop-flexport
+
+Flexport/EngineApiBoundary:
+  Enabled: true
