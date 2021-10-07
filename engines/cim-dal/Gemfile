@@ -6,11 +6,10 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Specify your gem's dependencies in cim-dal.gemspec.
 gemspec
 
-group :development do
+group :development, :test do
+  gem 'amount-types'
   gem 'pg'
 end
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
-gem 'amount-types'
-gem 'core-dal', path: '../core-dal'
