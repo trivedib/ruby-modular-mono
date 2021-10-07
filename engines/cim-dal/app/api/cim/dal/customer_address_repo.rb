@@ -21,6 +21,11 @@ module Cim
 
           cust_address.address_id
         end
+
+        # method to get count
+        def count
+          Cim::Dal::CustomerAddress.count
+        end
       end
     end
   end

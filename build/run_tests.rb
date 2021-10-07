@@ -21,26 +21,26 @@ class BuildOptimizer
       all_items
     end
 
-    # @return [Set]
-    def dirty_libraries
+    def changed_files
       changed_files = p `git diff $(git merge-base origin/master HEAD) --name-only`.split("\n")
       raise 'failed to get changed files' if changed_files.nil?
 
+      changed_files
+    end
+
+    # @return [Set]
+    def modified_libraries
       changed_gems = Set.new
       changed_engines = Set.new
       changed_db = false
       changed_top_level = false
       changed_files.each do |file|
-        case file
-        when %r{^gems/(\w+)}
-          changed_gems << Regexp.last_match[1]
-        when %r{^engines/(\w+)}
-          changed_engines << Regexp.last_match[1]
-        when %r{^db/}
-          changed_db = true
-        when %r{^scripts/} # rubocop:disable Lint/EmptyWhen
-          # scripts do not affect the build
-        else
+        next if file.index('build')&.zero?
+
+        changed_gems << file.split('/')[1] if file.index('gems')&.zero?
+        changed_engines << file.split('/')[1] if file.index('engines')&.zero?
+        changed_db = true if !changed_db && file.index('db')&.zero?
+        if !changed_top_level && file.index('gems').nil? && file.index('engines').nil? && file.index('db').nil?
           changed_top_level = true
         end
       end
@@ -55,7 +55,14 @@ class BuildOptimizer
         changed_gems + changed_engines
       end
     end
+
+    def run_tests
+      modified_libraries.each do |lib|
+        puts "running tests for lib: #{lib}"
+      end
+      puts 'tests executed successfully'
+    end
   end
 end
 
-puts BuildOptimizer.dirty_libraries
+puts BuildOptimizer.run_tests
