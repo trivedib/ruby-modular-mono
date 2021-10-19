@@ -11,6 +11,22 @@ module Cim
         id = Cim::Dal::IdentityRepo.create(identity_dto)
         puts "new identity id #{id}"
         raise_error unless id
+
+        # connecting to CC DB
+        puts "The number of payments are: #{::Cc::Payment.count}"
+        puts ::Cc::Payment.last.to_json
+
+        puts 'inserting a new record....'
+        payment = ::Cc::Payment.new
+        payment.account_id = ::Cc::Payment.last.account_id
+        payment.strategy = ::Cc::Payment.last.strategy
+        payment.date = ::Cc::Payment.last.date
+        payment.status = ::Cc::Payment.last.status
+        payment.origin = ::Cc::Payment.last.origin
+        payment.scheduled_amount_cents = ::Cc::Payment.last.scheduled_amount_cents
+        payment.payment_method = ::Cc::Payment.last.payment_method
+        payment.save!
+        puts payment.to_json
       end
     end
   end
